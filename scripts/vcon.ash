@@ -298,6 +298,11 @@ static item_set excluded_consumables = $items[
     Deep Dish of Legend,
     Pizza of Legend,
 
+    // Consumables whose creation requires untradeable limited ingredients
+    tankard of spiced rum,
+    tankard of spiced Goldschlepper,
+    cursed Aztec tamale,
+
     // Vampyre consumables - usable only in Dark Gyffte
     bloodstick,
     actual blood sausage,
@@ -634,7 +639,15 @@ void main()
     print( "Calculating expected profit for consumables, given Meat Per Adventure = " + mpa );
     print( "" );
 
-    calculate_best_consumables( mpa );
+    // Since KoLmafia uses valueOfAdventure when calculating cost to create,
+    // override to our expected Meat Per Adventure
+    int current_voa = get_property( "valueOfAdventure" ).to_int();
+    try {
+	set_property( "valueOfAdventure", mpa );
+	calculate_best_consumables( mpa );
+    } finally {
+	set_property( "valueOfAdventure", current_voa );
+    }
 
     print( "" );
     print( "******Best Food by Size******" );
