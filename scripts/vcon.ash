@@ -224,7 +224,7 @@ consumable find_profitable_consumable( item_set [] consumables, int size, int mp
 
     foreach index, set in consumables {
 	foreach consumable in set {
-	    // skip candies, since we'd prefer to use them for Swwet Synthesis
+	    // skip candies, since we'd prefer to use them for Sweet Synthesis
 	    if ( consumable.candy ) {
 		continue;
 	    }
@@ -235,11 +235,17 @@ consumable find_profitable_consumable( item_set [] consumables, int size, int mp
 		continue;
 	    }
 
-	    int price = retrieve_price( needed, consumable, true ) / needed;
-	    if ( price > max_price || price <= 0 ) {
-		// Too expensive or bogus (Speakeasy drinks are tradeable but have no mall price)
-		continue;
+	    if ( consumable.available_amount() < needed ) {
+		// We'll have to go to the mall for this item.
+		int mall = consumable.mall_price();
+		if ( mall > max_price || mall <= 0 ) {
+		    // Too expensive or bogus (Speakeasy drinks are tradeable but have no mall price)
+		    continue;
+		}
 	    }
+
+	    // calculate price to retrieve, accounting for valueOfInventory
+	    int price = retrieve_price( needed, consumable, true ) / needed;
 
 	    // Calculate how much Meat we expect to earn with this consumable's adventure yield
 	    int expected_income = my_expected_mpa * adventures;
